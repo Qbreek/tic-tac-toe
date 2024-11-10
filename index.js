@@ -1,3 +1,8 @@
+import JSConfetti from "js-confetti";
+
+// The application container.
+const applicationContainer = document.querySelector("#app");
+
 // All the possible winning scenarios in the board.
 const GAME_SCENARIOS = {
   HORIZONTAL: [
@@ -26,8 +31,8 @@ const checkVictoryConditions = (scenarios) => {
     );
 
     return (
-      blocks.every((block) => block === ANSWERS.X) ||
-      blocks.every((block) => block === ANSWERS.O)
+      blocks.every((block) => block === PLAYERS.X) ||
+      blocks.every((block) => block === PLAYERS.O)
     );
   });
 };
@@ -35,18 +40,59 @@ const checkVictoryConditions = (scenarios) => {
 // Creating a custom event that is triggered on every player event to check the winning conditions.
 const onMovePlayedEvent = new CustomEvent("onMovedPlayed");
 
-// Append the custom event to the document.
-document.addEventListener("onMovedPlayed", () => {
-  checkVictoryConditions(GAME_SCENARIOS.HORIZONTAL);
-  checkVictoryConditions(GAME_SCENARIOS.VERTICAL);
-  checkVictoryConditions(GAME_SCENARIOS.DIAGONAL);
-});
+// onMovedPlayed we need to check the board for victory conditions.
+const checkBoard = () => {
+  const hasWon = [
+    checkVictoryConditions(GAME_SCENARIOS.HORIZONTAL),
+    checkVictoryConditions(GAME_SCENARIOS.VERTICAL),
+    checkVictoryConditions(GAME_SCENARIOS.DIAGONAL),
+  ].some((condition) => condition);
+
+  if (!hasWon) return;
+
+  document.dispatchEvent(onPlayerVictory);
+};
+
+// Append the onMovedPlayed event to the document.
+document.addEventListener("onMovedPlayed", checkBoard);
+
+// Creating a custom event that is triggered player victory.
+const onPlayerVictory = new CustomEvent("onPlayerVictory");
+
+// onVictory we trigger some animations.
+const onVictory = () => {
+  new JSConfetti().addConfetti({
+    emojis: ["🌈", "⚡️", "💥", "✨", "💫", "🌸"],
+  });
+
+  applicationContainer.replaceChildren();
+  applicationContainer.classList.add("flex-container");
+
+  const playerWonMessage = document.createElement("p");
+  const playedLast = isXTurn ? PLAYERS.O : PLAYERS.X;
+  const victoryMessage = `Player ${playedLast}  has won`;
+  playerWonMessage.textContent = victoryMessage;
+
+  const resetGameBoardBtn = document.createElement("button");
+  resetGameBoardBtn.textContent = "Restart";
+
+  resetGameBoardBtn.addEventListener("click", () => {
+    applicationContainer.classList.remove("flex-container");
+    applicationContainer.replaceChildren();
+    draw3x3GameBoard();
+  });
+
+  applicationContainer.append(playerWonMessage, resetGameBoardBtn);
+};
+
+// Append the Victory event to the document.
+document.addEventListener("onPlayerVictory", onVictory);
 
 // Global variable dictating whether it's 'X' or 'O' turn.
 let isXTurn = true;
 
 // Map of the possible answers.
-const ANSWERS = {
+const PLAYERS = {
   X: "X",
   O: "O",
 };
@@ -60,8 +106,9 @@ const ticTacToeBlockCreator = (indexNumber) => {
   block.setAttribute(COORDINATE_ATR, indexNumber);
 
   const blockBehavior = () => {
+    // This means that the player has already played.
     if (block.textContent) return;
-    block.textContent = isXTurn ? ANSWERS.X : ANSWERS.O;
+    block.textContent = isXTurn ? PLAYERS.X : PLAYERS.O;
     isXTurn = !isXTurn;
   };
 
@@ -75,8 +122,10 @@ const ticTacToeBlockCreator = (indexNumber) => {
 };
 
 // Draws the board to the screen.
-(function draw3x3GameBoard() {
+const draw3x3GameBoard = () => {
   for (let index = 0; index < 9; index++) {
-    document.querySelector("#app").appendChild(ticTacToeBlockCreator(index));
+    applicationContainer.appendChild(ticTacToeBlockCreator(index));
   }
-})();
+};
+
+draw3x3GameBoard();

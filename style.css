@@ -16,7 +16,19 @@ body {
   padding: 2rem;
 }
 
-#app {
+div {
+  border: 1px solid black;
+  font-size: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+p {
+  font-size: 4rem;
+}
+
+.grid-container {
   height: 100%;
   width: 100%;
   display: grid;
@@ -24,10 +36,26 @@ body {
   grid-template-rows: repeat(3, 1fr);
 }
 
-div {
-  border: 1px solid black;
-  font-size: 3rem;
+.flex-container {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+button {
+  background-color: purple;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 2rem;
+  color: white;
+  padding: 20px;
+  margin-top: 1rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: red;
 }
