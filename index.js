@@ -23,18 +23,23 @@ const GAME_SCENARIOS = {
 
 // checkVictoryConditions loops through all the possible winning scenarios and checks if either 'X' or 'O' has won.
 const checkVictoryConditions = (scenarios) => {
-  return scenarios.some((scenario) => {
+  let hasWon = false;
+
+  scenarios.forEach((scenario) => {
+    if (hasWon) return;
+
     const blocks = scenario.map(
       (coordinate) =>
         document.querySelector(`[${COORDINATE_ATR}="${coordinate}"]`)
           .textContent
     );
 
-    return (
+    hasWon =
       blocks.every((block) => block === PLAYERS.X) ||
-      blocks.every((block) => block === PLAYERS.O)
-    );
+      blocks.every((block) => block === PLAYERS.O);
   });
+
+  return hasWon;
 };
 
 // Creating a custom event that is triggered on every player event to check the winning conditions.
