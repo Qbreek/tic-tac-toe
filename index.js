@@ -64,6 +64,30 @@ document.addEventListener("onMovedPlayed", checkBoard);
 // Creating a custom event that is triggered player victory.
 const onPlayerVictory = new CustomEvent("onPlayerVictory");
 
+const victoryMessageCreator = () => {
+  const playerWonMessage = document.createElement("p");
+  const playedLast = isXTurn ? PLAYERS.O : PLAYERS.X;
+  const victoryMessage = `Player ${playedLast}  has won`;
+  playerWonMessage.textContent = victoryMessage;
+
+  return playerWonMessage;
+};
+
+const resetButtonCreator = () => {
+  const resetGameBoardBtn = document.createElement("button");
+  resetGameBoardBtn.textContent = "Restart";
+
+  const resetButtonBehavior = () => {
+    applicationContainer.classList.remove("flex-container");
+    applicationContainer.replaceChildren();
+    draw3x3GameBoard();
+  };
+
+  resetGameBoardBtn.addEventListener("click", resetButtonBehavior);
+
+  return resetGameBoardBtn;
+};
+
 // onVictory we trigger some animations.
 const onVictory = () => {
   new JSConfetti().addConfetti({
@@ -73,21 +97,7 @@ const onVictory = () => {
   applicationContainer.replaceChildren();
   applicationContainer.classList.add("flex-container");
 
-  const playerWonMessage = document.createElement("p");
-  const playedLast = isXTurn ? PLAYERS.O : PLAYERS.X;
-  const victoryMessage = `Player ${playedLast}  has won`;
-  playerWonMessage.textContent = victoryMessage;
-
-  const resetGameBoardBtn = document.createElement("button");
-  resetGameBoardBtn.textContent = "Restart";
-
-  resetGameBoardBtn.addEventListener("click", () => {
-    applicationContainer.classList.remove("flex-container");
-    applicationContainer.replaceChildren();
-    draw3x3GameBoard();
-  });
-
-  applicationContainer.append(playerWonMessage, resetGameBoardBtn);
+  applicationContainer.append(victoryMessageCreator(), resetButtonCreator());
 };
 
 // Append the Victory event to the document.
